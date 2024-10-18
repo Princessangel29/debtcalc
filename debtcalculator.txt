@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debt Payment Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .calculator-container {
+            background: linear-gradient(135deg, #0d0470, #191db9); /* Background color */
+            padding: 30px;
+            border-radius: 20px;
+            color: white;
+            max-width: 700px; /* Increased width for label and input side by side */
+            width: 100%;
+        }
+
+        .calculator-container h2 {
+            font-size: 1.5em;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .input-group input,
+        .input-group select {
+            width: 60%;
+            padding: 12px 15px;
+            border-radius: 5px;
+            border: none;
+            font-size: 1em;
+            padding-left: 40px; /* To make space for the $ icon */
+        }
+
+        .input-group label {
+            margin-left: 10px;
+            font-size: 0.9em;
+            flex-shrink: 0; /* Prevent label from shrinking */
+            width: 40%; /* Ensure the label stays on the right */
+            text-align: right;
+        }
+
+        .input-group::before {
+            content: '$';
+            font-size: 1.2em;
+            position: absolute;
+            left: 10px;
+            color: #666;
+        }
+
+        .input-group.icon-date::before {
+            content: '📅';
+            font-size: 1.2em;
+            position: absolute;
+            left: 10px;
+            color: #666;
+        }
+
+        #results {
+            margin-top: 20px;
+            text-align: center;
+            display: none;
+        }
+
+        #results p {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator-container">
+        <h2>Find out how your monthly payments could be reduced and witness the changes in your MoneyLife™</h2>
+        <form id="debt-calculator">
+            <div class="input-group">
+                <input type="number" id="totalDebt" placeholder="">
+                <label for="totalDebt">Total combined unsecured debt (exclude mortgage/auto—must be at least $7,000)</label>
+            </div>
+
+            <div class="input-group">
+                <input type="number" id="monthlyPayments" placeholder="">
+                <label for="monthlyPayments">Total monthly debt payments</label>
+            </div>
+
+            <div class="input-group icon-date">
+                <select id="paymentPeriod">
+                    <option value="" disabled selected>--- Select an option ---</option>
+                    <option value="12">12 months</option>
+                    <option value="24">24 months</option>
+                    <option value="36">36 months</option>
+                    <option value="48">48 months</option>
+                </select>
+                <label for="paymentPeriod">How soon do you want to pay off your debt?</label>
+            </div>
+        </form>
+
+        <div id="results">
+            <h3>Results</h3>
+            <p>Estimated Monthly Payment: <span id="estimatedPayment"></span></p>
+            <p>Estimated Monthly Savings: <span id="monthlySavings"></span></p>
+        </div>
+    </div>
+
+    <script>
+        // Attach event listeners to form fields to trigger calculations automatically
+        document.getElementById('totalDebt').addEventListener('input', calculatePayments);
+        document.getElementById('monthlyPayments').addEventListener('input', calculatePayments);
+        document.getElementById('paymentPeriod').addEventListener('input', calculatePayments);
+
+        function calculatePayments() {
+            const totalDebt = parseFloat(document.getElementById('totalDebt').value);
+            const monthlyPayments = parseFloat(document.getElementById('monthlyPayments').value);
+            const paymentPeriod = parseInt(document.getElementById('paymentPeriod').value);
+
+            // Check if all values are entered and valid
+            if (!isNaN(totalDebt) && !isNaN(monthlyPayments) && !isNaN(paymentPeriod) && paymentPeriod > 0) {
+                // Formula for new debt payment: (totalDebt * 0.49) / paymentPeriod + 80 (maintenance fee)
+                const contractBalance = totalDebt * 0.49;
+                const estimatedPayment = (contractBalance / paymentPeriod + 80).toFixed(2);
+
+                // Formula for credit card minimum payment: totalDebt * 0.03
+                const minimumPayment = (totalDebt * 0.03).toFixed(2);
+
+                // Formula for savings: minimumPayment - estimatedPayment
+                const monthlySavings = (minimumPayment - estimatedPayment).toFixed(2);
+
+                // Display the results
+                document.getElementById('estimatedPayment').innerText = `$${estimatedPayment}`;
+                document.getElementById('monthlySavings').innerText = `$${monthlySavings}`;
+                
+                // Show the results section
+                document.getElementById('results').style.display = 'block';
+            } else {
+                // If the values are invalid or missing, hide the results
+                document.getElementById('results').style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
